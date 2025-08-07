@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Management</title>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 2rem;
+        }
+
+        form,
+        .section {
+            margin-bottom: 2rem;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+
+        input,
+        select {
+            margin: 0.5rem 0;
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            margin-top: 1rem;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 1rem;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        th,
+        td {
+            border: 1px solid #999;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        .inline-button {
+            display: inline-block;
+            margin-top: 0;
+            margin-left: 0.5rem;
+            padding: 0.5rem 1rem;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>User Management API </h1>
+
+    <!-- Create -->
+    <div class="section">
+        <h2>1. Създай потребител</h2>
+        <form id="createUserForm">
+            <input type="text" name="firstName" placeholder="First Name" required />
+            <input type="text" name="lastName" placeholder="Last Name" required />
+            <input type="date" name="dateOfBirth" required />
+            <input type="tel" name="phoneNumber" placeholder="Phone Number" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <button type="submit">Създай</button>
+        </form>
+        <div id="createUserResult"></div>
+    </div>
+
+    <!-- Get by Email -->
+    <div class="section">
+        <h2>2. Вземи потребител по Email</h2>
+        <input type="email" id="getUserEmail" placeholder="User Email" />
+        <button onclick="getUserByEmail()">Вземи</button>
+        <div id="getUserResult"></div>
+    </div>
+
+    <!-- Get All -->
+    <div class="section">
+        <h2>3. Вземи всички потребители</h2>
+        <label>Търсене: <input type="text" id="search" placeholder="име, email и др." /></label>
+        <label>Сортирай по:
+            <select id="sortBy">
+                <option value="">-- Няма --</option>
+                <option value="lastName">Last Name</option>
+                <option value="dateOfBirth">Date of Birth</option>
+            </select>
+        </label>
+        <label>Страница: <input type="number" id="page" value="1" min="1" /></label>
+        <label>Брой на страница: <input type="number" id="limit" value="10" min="1" /></label>
+        <button onclick="getAllUsers()">Зареди</button>
+
+        <div id="allUsersTableContainer"></div>
+    </div>
+
+    <!-- Update by Email -->
+    <div class="section">
+        <h2>4. Обнови потребител по Email</h2>
+        <form id="updateUserForm">
+            <label>
+                Email (за търсене и зареждане)
+                <input type="email" name="email" id="updateEmail" placeholder="User Email" required
+                    style="width: auto; display: inline-block;" />
+                <button type="button" class="inline-button" onclick="loadUserForUpdate()">Зареди</button>
+            </label>
+            <input type="text" name="firstName" placeholder="New First Name" />
+            <input type="text" name="lastName" placeholder="New Last Name" />
+            <input type="date" name="dateOfBirth" />
+            <input type="tel" name="phoneNumber" placeholder="New Phone" />
+            <button type="submit">Обнови</button>
+        </form>
+        <div id="updateUserResult"></div>
+    </div>
+
+    <!-- Delete by Email -->
+    <div class="section">
+        <h2>5. Изтрий потребител по Email</h2>
+        <input type="email" id="deleteUserEmail" placeholder="User Email" />
+        <button onclick="deleteUser()">Изтрий</button>
+        <pre id="deleteUserResult"></pre>
+    </div>
+
+    <script>
+        const apiBase = '/api/users';
+
+        function renderUsersTable(users) {
+            if (!Array.isArray(users) || users.length === 0) {
+                return '<p>Няма намерени потребители.</p>';
+            }
+            const headers = ['ID', 'First Name', 'Last Name', 'Date of Birth', 'Phone Number', 'Email'];
+            const rows = users.map(u => `
+                <tr>
+                    <td>${u.id || '-'}</td>
+                    <td>${u.firstName || '-'}</td>
+                    <td>${u.lastName || '-'}</td>
+                    <td>${u.dateOfBirth || '-'}</td>
+                    <td>${u.phoneNumber || '-'}</td>
+                    <td>${u.email || '-'}</td>
+                </tr>
+            `).join('');
+            return `
+                <table>
+                    <thead>
+                        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+        }
+
+        function renderSingleUserTable(user) {
+            if (!user) {
+                return '<p>Няма намерен потребител.</p>';
+            }
+            const headers = ['ID', 'First Name', 'Last Name', 'Date of Birth', 'Phone Number', 'Email'];
+            const row = `
+                <tr>
+                    <td>${user.id || '-'}</td>
+                    <td>${user.firstName || '-'}</td>
+                    <td>${user.lastName || '-'}</td>
+                    <td>${user.dateOfBirth || '-'}</td>
+                    <td>${user.phoneNumber || '-'}</td>
+                    <td>${user.email || '-'}</td>
+                </tr>
+            `;
+            return `
+                <table>
+                    <thead>
+                        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>${row}</tbody>
+                </table>
+            `;
+        }
+
+        document.getElementById('createUserForm').onsubmit = async e => {
+            e.preventDefault();
+            const form = e.target;
+            const data = Object.fromEntries(new FormData(form));
+            const res = await fetch(apiBase, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                document.getElementById('createUserResult').innerHTML = `<p style="color:red;">Грешка: ${errorText}</p>`;
+                return;
+            }
+
+            const createdUser = await res.json();
+            document.getElementById('createUserResult').innerHTML = renderSingleUserTable(createdUser);
+            form.reset();
+        };
+
+        async function getUserByEmail() {
+            const email = document.getElementById('getUserEmail').value.trim();
+            if (!email) {
+                alert('Въведете email');
+                return;
+            }
+            const params = new URLSearchParams({ search: email, limit: 1000 });
+            const res = await fetch(`${apiBase}?${params}`);
+            if (!res.ok) {
+                document.getElementById('getUserResult').textContent = 'Грешка при заявката';
+                return;
+            }
+            const users = await res.json();
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+            const container = document.getElementById('getUserResult');
+            if (user) {
+                container.innerHTML = renderSingleUserTable(user);
+            } else {
+                container.textContent = 'Потребител с този email не е намерен';
+            }
+        }
+
+        async function getAllUsers() {
+            const params = new URLSearchParams({
+                search: document.getElementById('search').value,
+                sortBy: document.getElementById('sortBy').value,
+                page: document.getElementById('page').value,
+                limit: document.getElementById('limit').value
+            });
+            const res = await fetch(`${apiBase}?${params}`);
+            if (!res.ok) {
+                document.getElementById('allUsersTableContainer').innerHTML = '<p>Грешка при зареждане на потребителите.</p>';
+                return;
+            }
+            const users = await res.json();
+            document.getElementById('allUsersTableContainer').innerHTML = renderUsersTable(users);
+        }
+
+        async function loadUserForUpdate() {
+            const emailInput = document.getElementById('updateEmail');
+            const email = emailInput.value.trim();
+            if (!email) {
+                alert('Въведете email за зареждане');
+                return;
+            }
+            const params = new URLSearchParams({ search: email, limit: 1000 });
+            const res = await fetch(`${apiBase}?${params}`);
+            if (!res.ok) {
+                document.getElementById('updateUserResult').textContent = 'Грешка при зареждане на потребителя';
+                return;
+            }
+            const users = await res.json();
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (!user) {
+                document.getElementById('updateUserResult').textContent = 'Потребител с този email не е намерен';
+                return;
+            }
+
+            const form = document.getElementById('updateUserForm');
+            form.firstName.value = user.firstName || '';
+            form.lastName.value = user.lastName || '';
+            form.dateOfBirth.value = user.dateOfBirth || '';
+            form.phoneNumber.value = user.phoneNumber || '';
+            document.getElementById('updateUserResult').textContent = 'Данните са заредени. Можете да редактирате.';
+        }
+
+        document.getElementById('updateUserForm').onsubmit = async e => {
+            e.preventDefault();
+            const form = e.target;
+            const formData = Object.fromEntries(new FormData(form));
+            const email = formData.email.trim();
+            if (!email) {
+                alert('Email е задължителен за обновяване');
+                return;
+            }
+            const params = new URLSearchParams({ search: email, limit: 1000 });
+            const resGet = await fetch(`${apiBase}?${params}`);
+            if (!resGet.ok) {
+                document.getElementById('updateUserResult').textContent = 'Грешка при търсене на потребител';
+                return;
+            }
+            const users = await resGet.json();
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (!user) {
+                document.getElementById('updateUserResult').textContent = 'Потребител с този email не е намерен';
+                return;
+            }
+
+            const { email: _e, ...updateData } = formData;
+
+            const resUpdate = await fetch(`${apiBase}/${user.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!resUpdate.ok) {
+                const errorText = await resUpdate.text();
+                document.getElementById('updateUserResult').innerHTML = `<p style="color:red;">Грешка: ${errorText}</p>`;
+                return;
+            }
+
+            const updatedUser = await resUpdate.json();
+            document.getElementById('updateUserResult').innerHTML = renderSingleUserTable(updatedUser);
+            form.reset();
+        };
+
+        async function deleteUser() {
+            const email = document.getElementById('deleteUserEmail').value.trim();
+            if (!email) {
+                alert('Въведете email');
+                return;
+            }
+            const params = new URLSearchParams({ search: email, limit: 1000 });
+            const resGet = await fetch(`${apiBase}?${params}`);
+            if (!resGet.ok) {
+                document.getElementById('deleteUserResult').textContent = 'Грешка при търсене на потребител';
+                return;
+            }
+            const users = await resGet.json();
+            const user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (!user) {
+                document.getElementById('deleteUserResult').textContent = 'Потребител с този email не е намерен';
+                return;
+            }
+
+            const resDelete = await fetch(`${apiBase}/${user.id}`, { method: 'DELETE' });
+            document.getElementById('deleteUserResult').textContent = resDelete.status === 204
+                ? 'Успешно изтрит!'
+                : JSON.stringify(await resDelete.json(), null, 2);
+        }
+    </script>
+</body>
+
+</html>

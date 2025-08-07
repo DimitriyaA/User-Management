@@ -1,4 +1,4 @@
-# 📚 API Документация
+# 📚 API Documentation
 
 ## Base URL
 ```
@@ -8,7 +8,7 @@
 ## Endpoints
 
 ### ✅ POST `/`
-Създаване на нов потребител.
+Creates a new user.  
 **Body:**
 ```json
 {
@@ -23,24 +23,24 @@
 ---
 
 ### 🔍 GET `/`
-Връща всички потребители.
+Returns all users.
 
-**Query params (по избор):**
-- `sortBy=lastName` или `sortBy=dateOfBirth`
+**Optional query params:**
+- `sortBy=lastName` or `sortBy=dateOfBirth`
 - `search=ivan`
 - `page=1&limit=10`
 
 ---
 
 ### 🔎 GET `/:id`
-Връща потребител по ID.
+Returns a user by ID.
 
 ---
 
 ### ✏️ PUT `/:id`
-Обновява потребител по ID.
+Updates a user by ID.
 
 ---
 
 ### ❌ DELETE `/:id`
-Изтрива потребител по ID.
+Deletes a user by ID.

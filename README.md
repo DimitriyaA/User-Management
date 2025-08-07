@@ -1,27 +1,28 @@
 # User Management API
 
-## 🚀 Старт на проекта
+## 🚀 Project Startup
 
-### 🛠 Изисквания
+### 🛠 Requirements
 - Node.js
-- Firebase проект с активирана Firestore база
-- Създаден serviceAccountKey.json (виж по-долу)
+- Firebase project with Firestore enabled
+- serviceAccountKey.json created (see below)
 
-### 📦 Инсталация
+### 📦 Installation
 ```bash
 npm install
 ```
 
-### ⚙️ Стартиране на приложението
+### ⚙️ Run the Application
 ```bash
 npm run dev
 ```
 
-### 🔑 Firebase service account
-Сложи `serviceAccountKey.json` в кореновата директория.
+### 🔑 Firebase Service Account
+Place `serviceAccountKey.json` in the root directory.
 
 ---
 
+
 ## 🧪 API Endpoints
 
-Виж `api-docs.md` за пълна документация.
+See `api-docs.md` for full documentation.

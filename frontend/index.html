@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>User Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <h1>User Management API</h1>
+
+    <!-- Create -->
+    <div class="section">
+        <h2>1. Създай потребител</h2>
+        <form id="createUserForm">
+            <input type="text" name="firstName" placeholder="First Name" required />
+            <input type="text" name="lastName" placeholder="Last Name" required />
+            <input type="date" name="dateOfBirth" required />
+            <input type="tel" name="phoneNumber" placeholder="Phone Number" required />
+            <input type="email" name="email" placeholder="Email" required />
+            <button type="submit">Създай</button>
+        </form>
+        <div id="createUserResult"></div>
+    </div>
+
+    <!-- Get by Email -->
+    <div class="section">
+        <h2>2. Вземи потребител по Email</h2>
+        <input type="email" id="getUserEmail" placeholder="User Email" />
+        <button onclick="getUserByEmail()">Вземи</button>
+        <div id="getUserResult"></div>
+    </div>
+
+    <!-- Get All -->
+    <div class="section">
+        <h2>3. Вземи всички потребители</h2>
+        <label>Търсене: <input type="text" id="search" placeholder="име, email и др." /></label>
+        <label>Сортирай по:
+            <select id="sortBy">
+                <option value="">-- Няма --</option>
+                <option value="lastName">Last Name</option>
+                <option value="dateOfBirth">Date of Birth</option>
+            </select>
+        </label>
+        <label>Страница: <input type="number" id="page" value="1" min="1" /></label>
+        <label>Брой на страница: <input type="number" id="limit" value="10" min="1" /></label>
+        <button onclick="getAllUsers()">Зареди</button>
+
+        <div id="allUsersTableContainer"></div>
+    </div>
+
+    <!-- Update by Email -->
+    <div class="section">
+        <h2>4. Обнови потребител по Email</h2>
+        <form id="updateUserForm">
+            <label>
+                Email (за търсене и зареждане)
+                <input type="email" name="email" id="updateEmail" placeholder="User Email" required
+                    style="width: auto; display: inline-block;" />
+                <button type="button" class="inline-button" onclick="loadUserForUpdate()">Зареди</button>
+            </label>
+            <input type="text" name="firstName" placeholder="New First Name" />
+            <input type="text" name="lastName" placeholder="New Last Name" />
+            <input type="date" name="dateOfBirth" />
+            <input type="tel" name="phoneNumber" placeholder="New Phone" />
+            <button type="submit">Обнови</button>
+        </form>
+        <div id="updateUserResult"></div>
+    </div>
+
+    <!-- Delete by Email -->
+    <div class="section">
+        <h2>5. Изтрий потребител по Email</h2>
+        <input type="email" id="deleteUserEmail" placeholder="User Email" />
+        <button onclick="deleteUser()">Изтрий</button>
+        <pre id="deleteUserResult"></pre>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

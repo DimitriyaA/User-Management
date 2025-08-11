@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 2rem;
+}
+
+form,
+.section {
+    margin-bottom: 2rem;
+    border: 1px solid #ccc;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+input,
+select {
+    margin: 0.5rem 0;
+    display: block;
+    width: 100%;
+    padding: 0.5rem;
+}
+
+button {
+    padding: 0.5rem 1rem;
+    margin-top: 1rem;
+}
+
+pre {
+    background: #f4f4f4;
+    padding: 1rem;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+th,
+td {
+    border: 1px solid #999;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+th {
+    background-color: #eee;
+}
+
+.inline-button {
+    display: inline-block;
+    margin-top: 0;
+    margin-left: 0.5rem;
+    padding: 0.5rem 1rem;
+    vertical-align: middle;
+    cursor: pointer;
+}
